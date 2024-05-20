@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bai01</title>
+</head>
+<body>
+    <h1>Authors</h1>
+    <ul id="authors"></ul>
+
+    <script>
+        const ul = document.getElementById('authors');
+        const list = document.createDocumentFragment();
+        const url = 'https://jsonplaceholder.typicode.com/users';
+      
+        fetch(url)
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            let authors = data;
+      
+            authors.map(function(author) {
+              let li = document.createElement('li');
+              let name = document.createElement('h2');
+              let email = document.createElement('span');
+      
+              name.innerHTML = `${author.name}`;
+              email.innerHTML = `${author.email}`;
+      
+              li.appendChild(name);
+              li.appendChild(email);
+              list.appendChild(li);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = 'Failed to load authors.';
+            document.body.appendChild(errorMessage);
+          });
+      
+        ul.appendChild(list);
+        
+      </script>
+</body>
+</html>

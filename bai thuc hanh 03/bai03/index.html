@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            background: rgb(90, 138, 180);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .container {
+            background: rgb(190, 250, 245);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(214, 198, 198, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: rgb(13, 27, 27);
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background: none;
+            border-bottom: #45a049;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .admin-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #fafafa;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #fbfbfb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h1>Login</h1>
+        <div id="error-message" class="error"></div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div class="admin-container" id="admin-container">
+        <h1>Student Management</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên</th>
+                    <th>Tuổi</th>
+                    <th>Địa chỉ</th>
+                    <th>SDT</th>
+                    <th>Email</th>
+                    <th>Lớp học</th>
+                </tr>
+            </thead>
+            <tbody id="student-table-body">
+                <!-- Sinh viên sẽ được hiển thị ở đây -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
+
+            const response = await fetch('http://127.0.0.1:8000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                document.getElementById("login-container").style.display = 'none';
+                document.getElementById("admin-container").style.display = 'flex';
+                loadStudents();
+            } else {
+                const errorData = await response.json();
+                errorMessage.textContent = errorData.detail;
+            }
+        }
+
+        async function loadStudents() {
+            const response = await fetch('http://127.0.0.1:8000/students');
+            const students = await response.json();
+            const studentTableBody = document.getElementById("student-table-body");
+
+            studentTableBody.innerHTML = '';
+            students.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${student.name}</td>
+                    <td>${student.age}</td>
+                    <td>${student.address}</td>
+                    <td>${student.phone}</td>
+                    <td>${student.email}</td>
+                    <td>${student.class_name}</td>
+                `;
+                studentTableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
